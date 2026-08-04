@@ -31,7 +31,7 @@ if DATABASE_URL:
     config.set_main_option("sqlalchemy.url", DATABASE_URL)
 else:
     raise ValueError("DATABASE_URL not set in the environment variables")
-target_metadata = Base.me
+target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
