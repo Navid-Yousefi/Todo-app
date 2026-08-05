@@ -12,9 +12,14 @@ router = APIRouter(tags=['tasks'])
 
 
 @router.get('/tasks-list', status_code=status.HTTP_200_OK, response_model=List[TaskResponseSchema])
-def retrive_tasks_list(db: Session = Depends(get_db)):
-    query = db.query(TaskModel).all()
-    return query
+def retrive_tasks_list(
+    db: Session = Depends(get_db),
+    is_completed: bool = Query(None, description="Filter tasks by completion status or not")
+):
+    query = db.query(TaskModel)
+    if is_completed is not None:
+        query = query.filter_by(is_completed=is_completed)
+    return query.all()
 
 
 
