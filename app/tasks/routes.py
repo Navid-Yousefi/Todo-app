@@ -7,7 +7,7 @@ from tasks.models import TaskModel
 from fastapi.responses import JSONResponse
 
 
-router = APIRouter(tags=['tasks'])
+router = APIRouter(tags=['tasks'],  prefix='/tasks')
 
 
 
