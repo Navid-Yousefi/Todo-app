@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime
+from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from core.database import Base
 from datetime import datetime
@@ -15,7 +15,7 @@ class UserModel(Base):
     username = Column(String(50), nullable=False, unique=True)
     email = Column(String(150), nullable=False, unique=True)
     password = Column(String(255), nullable=False)
-    is_active = Column(Boolean, default=True)
+    is_active = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
@@ -32,4 +32,16 @@ class UserModel(Base):
 
     def set_password(self, plain_text: str) -> None:
         self.password = self.hash_password(plain_text)
+
+
+
+class TokenModel(Base):
+    __tablename__ = 'tokens'
+    user_id = Column(Integer, ForeignKey('users.id'))
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    token = Column(String, nullable=False, unique=True)
+    created_at = Column(DateTime, default=datetime.now())
+
+    user = relationship('UserModel', uselist=False)
     
