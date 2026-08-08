@@ -5,6 +5,7 @@ from users.schemas import *
 from users.model import UserModel, TokenModel
 from fastapi.responses import JSONResponse
 import secrets
+from auth.jwt_auth import generate_access_token, generate_refresh_token
 
 router = APIRouter(tags=['users'], prefix='/users')
 
@@ -22,11 +23,13 @@ async def user_login(request: UserLoginSchema, db: Session = Depends(get_db)):
     if not user_obj.verify_password(request.password):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='password is invalid')
 
-    token_obj = TokenModel(user_id=user_obj.id, token=generate_toke())
-    db.add(token_obj)
-    db.commit()
-    db.refresh(token_obj)
-    return JSONResponse(content={'detail': 'logged in successfulay', 'token':token_obj.token})
+    # token_obj = TokenModel(user_id=user_obj.id, token=generate_toke())
+    # db.add(token_obj)
+    # db.commit()
+    # db.refresh(token_obj)
+    access_token = generate_access_token(user_obj.id)
+    refresh_token = generate_refresh_token(user_obj.id)
+    return JSONResponse(content={'detail': 'logged in successfulay', 'access_token':access_token, 'refresh_token': refresh_token})
 
 
 @router.post('/register')
