@@ -25,3 +25,4 @@ class UserRegisterSchema(BaseModel):
 
 
 class  UserRefreshTokenSchama(BaseModel):
+    refresh_token: str = Field(..., description='Refresh token of the user')

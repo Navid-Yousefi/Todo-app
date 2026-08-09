@@ -1,17 +1,25 @@
-from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, ForeignKey, Enum as SQLEnum
 from sqlalchemy.orm import relationship
 from core.database import Base
 from datetime import datetime
 from pwdlib import PasswordHash
 from pwdlib.hashers.bcrypt import BcryptHasher
+from enum import Enum
 
 
 pwd_context = PasswordHash((BcryptHasher(),))
+
+class UserType(str, Enum):
+    ADMIN = 'admin'
+    USER = 'user'
+
 
 class UserModel(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    user_type = Column(SQLEnum(UserType), nullable=False)
+
     username = Column(String(50), nullable=False, unique=True)
     email = Column(String(150), nullable=False, unique=True)
     password = Column(String(255), nullable=False)
