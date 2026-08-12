@@ -22,10 +22,10 @@ if config.config_file_name is not None:
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-ENV_PATH = BASE_DIR / '.env'
+ENV_PATH = BASE_DIR / ".env"
 
 load_dotenv(ENV_PATH)
-DATABASE_URL = os.getenv('SQLALCHEMY_DATABASE_URL')
+DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL")
 
 
 if DATABASE_URL:
@@ -58,7 +58,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
-        render_as_batch=True
+        render_as_batch=True,
     )
 
     with context.begin_transaction():
@@ -78,7 +78,6 @@ def run_migrations_online() -> None:
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
-        
     )
 
     with connectable.connect() as connection:

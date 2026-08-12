@@ -1,4 +1,13 @@
-from sqlalchemy import Column, Integer, String, Text, Boolean, DateTime, ForeignKey, Enum as SQLEnum
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Text,
+    Boolean,
+    DateTime,
+    ForeignKey,
+    Enum as SQLEnum,
+)
 from sqlalchemy.orm import relationship
 from core.database import Base
 from datetime import datetime
@@ -6,19 +15,13 @@ from pwdlib import PasswordHash
 from pwdlib.hashers.bcrypt import BcryptHasher
 from enum import Enum
 
-
 pwd_context = PasswordHash((BcryptHasher(),))
-
-class UserType(str, Enum):
-    ADMIN = 'admin'
-    USER = 'user'
 
 
 class UserModel(Base):
-    __tablename__ = 'users'
+    __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_type = Column(SQLEnum(UserType), nullable=False)
 
     username = Column(String(50), nullable=False, unique=True)
     email = Column(String(150), nullable=False, unique=True)
@@ -27,29 +30,24 @@ class UserModel(Base):
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
-    tasks = relationship('TaskModel', back_populates='user')
-
+    tasks = relationship("TaskModel", back_populates="user")
 
     def hash_password(self, plain_password: str) -> str:
         return pwd_context.hash(plain_password)
 
-
-    def verify_password(self,plain_password: str) -> bool:
+    def verify_password(self, plain_password: str) -> bool:
         return pwd_context.verify(plain_password, self.password)
-
 
     def set_password(self, plain_text: str) -> None:
         self.password = self.hash_password(plain_text)
 
 
-
 class TokenModel(Base):
-    __tablename__ = 'tokens'
-    user_id = Column(Integer, ForeignKey('users.id'))
+    __tablename__ = "tokens"
+    user_id = Column(Integer, ForeignKey("users.id"))
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     token = Column(String, nullable=False, unique=True)
     created_at = Column(DateTime, default=datetime.now())
 
-    user = relationship('UserModel', uselist=False)
-    
+    user = relationship("UserModel", uselist=False)

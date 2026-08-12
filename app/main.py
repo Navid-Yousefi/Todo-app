@@ -3,17 +3,20 @@ from contextlib import asynccontextmanager
 from tasks.routes import router as tasks_routes
 from users.router import router as users_routes
 from users.model import UserModel
+from fastapi.middleware.gzip import GZipMiddleware
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print('Application startup')
+    print("Application startup")
     yield
 
-    print('Application shutdown')
+    print("Application shutdown")
 
 
 app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 app.include_router(tasks_routes)
 app.include_router(users_routes)
