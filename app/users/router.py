@@ -28,13 +28,13 @@ async def user_login(request: UserLoginSchema, db: Session = Depends(get_db)):
 
     if not user_obj:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="user denst exists"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid username or password"
         )
 
     if not user_obj.verify_password(request.password):
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="password is invalid",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid username or password",
         )
 
     token_obj = TokenModel(
