@@ -1,5 +1,3 @@
-
-
 def test_register_user_200(anon_client):
     payload = {
         'username': 'naviddev',
@@ -11,12 +9,12 @@ def test_register_user_200(anon_client):
     assert response.status_code == 201
 
 
-def test_login_response_401():
+def test_login_response_401(anon_client):
     payload = {
         'username': 'string11',
         'password': 'string11'
     }
-    response = client.post('/users/login', json=payload)
+    response = anon_client.post('/users/login', json=payload)
     assert response.status_code == 401
 
 

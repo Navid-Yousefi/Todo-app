@@ -9,9 +9,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-
-
-# print(settings.SQLALCHEMY_DATABASE_URL)
-# print('-------------------------------------------------------------')
-# print('-------------------------------------------------------------')
-# print(settings.JWT_SECRET_KEY)
