@@ -34,7 +34,7 @@ def retrive_tasks_list(
 
 
 @router.get(
-    "/tasks", status_code=status.HTTP_200_OK, response_model=TaskResponseSchema
+    "/detail", status_code=status.HTTP_200_OK, response_model=TaskResponseSchema
 )
 def retrive_tasks_detail(
     task_id: int = Query(...),
