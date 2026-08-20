@@ -1,0 +1,65 @@
+services:
+  db: 
+    image: postgres:15-alpine
+    container_name: db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis/data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+  smtp4dev:
+    image: rnwood/smtp4dev
+    restart: always
+    ports:
+      - '5000:80'
+      - '25:25'
+      - '143:143'
+    volumes:
+      - smtp4dev-data:/smtp4dev
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: backend
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      SQLALCHEMY_DATABASE_URL: YOUR PATH DATABASE 
+      REDIS_URL: YOUR PATH REDIS
+      JWT_SECRET_KEY: JWT_SECRET_KEY
+    ports:
+      - "8000:8000"
+    command: fastapi dev main.py --host 0.0.0.0 --port 8000
+    volumes:
+      - ./app:/usr/src/app
+
+
+volumes:
+  smtp4dev-data:
