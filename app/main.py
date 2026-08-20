@@ -58,3 +58,57 @@ async def http_validation_excption_handler(request, exc):
         'content': exc.errors()
     }
     return JSONResponse(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, content=error_response)
+
+
+
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+from fastapi_cache.decorator import cache
+from redis import asyncio as aioredis
+import httpx
+from core.config import settings
+
+
+redis = aioredis.from_url(settings.REDIS_URL)
+cache_backend = RedisBackend(redis)
+FastAPICache.init(cache_backend, prefix='fastapi-cache')
+
+
+async def request_current_weather(latitude: float, longitude: float):
+    url = 'https://api.open-meteo.com/v1/forecast'
+    params = {
+        'latitude': latitude,
+        'longitude': longitude,
+        'current': 'temperature_2m,relative_humidity_2m'
+    }
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, params=params)
+
+    if response.status_code == 200:
+        data = response.json()
+        current_weather = data.get('current', {})
+        return current_weather
+    else:
+        return None
+
+@app.get('/fetch-current-weather', status_code=status.HTTP_200_OK)
+@cache(expire=20)
+async def fetch_current_weather(latitude: float = 40.7128, longitude: float = -74.0060):
+    current_weather = await request_current_weather(latitude, longitude)
+    if current_weather:
+        return JSONResponse(content={'current_weather': current_weather})
+    else:
+        return JSONResponse(content={'detail': 'Failed to fetch weather'}, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+from core.email_util import send_email
+
+@app.get('/test-send-mail', status_code=status.HTTP_200_OK)
+async def test_send_mail():
+    await send_email(
+        subject='Test Email from Fastapi',
+        recipients=['naviddeveloper2002@gmail.com'],
+        body='This is a test email sent using the email_util function'
+    )
+    return JSONResponse(content={'detail': 'Email has been sent'})
