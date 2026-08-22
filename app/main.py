@@ -112,3 +112,8 @@ async def test_send_mail():
         body='This is a test email sent using the email_util function'
     )
     return JSONResponse(content={'detail': 'Email has been sent'})
+
+
+@app.get('/is_ready', status_code=status.HTTP_200_OK)
+def readiness():
+    return JSONResponse(content={'detail': 'Ok'})
