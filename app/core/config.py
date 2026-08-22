@@ -5,6 +5,10 @@ class Settings(BaseSettings):
     SQLALCHEMY_DATABASE_URL: str
     JWT_SECRET_KEY: str
     REDIS_URL: str
+    SENTRY_DSN: str
+
+
+
     MAIL_USERNAME: str = ""
     MAIL_PASSWORD: str = ""
     MAIL_FROM: str = "no-reply@example.com"

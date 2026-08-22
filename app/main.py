@@ -1,3 +1,10 @@
+from core.email_util import send_email
+from core.config import settings
+import httpx
+from redis import asyncio as aioredis
+from fastapi_cache.decorator import cache
+from fastapi_cache.backends.redis import RedisBackend
+from fastapi_cache import FastAPICache
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi import FastAPI, status
@@ -8,6 +15,10 @@ from users.router import router as users_routes
 from users.model import UserModel
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.cors import CORSMiddleware
+import sentry_sdk
+
+
+
 
 
 
@@ -40,6 +51,18 @@ app.add_middleware(
 )
 
 
+sentry_sdk.init(
+    dsn=settings.SENTRY_DSN,
+    # Add data like request headers and IP for users,
+    # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
+    send_default_pii=True,
+)
+
+@app.get("/sentry-debug")
+async def trigger_error():
+    division_by_zero = 1 / 0
+
+
 @app.exception_handler(StarletteHTTPException)
 async def http_excption_handler(request, exc):
     error_response = {
@@ -48,6 +71,7 @@ async def http_excption_handler(request, exc):
         'detail': str(exc.detail)
     }
     return JSONResponse(status_code=exc.status_code, content=error_response)
+
 
 @app.exception_handler(RequestValidationError)
 async def http_validation_excption_handler(request, exc):
@@ -58,15 +82,6 @@ async def http_validation_excption_handler(request, exc):
         'content': exc.errors()
     }
     return JSONResponse(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, content=error_response)
-
-
-
-from fastapi_cache import FastAPICache
-from fastapi_cache.backends.redis import RedisBackend
-from fastapi_cache.decorator import cache
-from redis import asyncio as aioredis
-import httpx
-from core.config import settings
 
 
 redis = aioredis.from_url(settings.REDIS_URL)
@@ -91,6 +106,7 @@ async def request_current_weather(latitude: float, longitude: float):
     else:
         return None
 
+
 @app.get('/fetch-current-weather', status_code=status.HTTP_200_OK)
 @cache(expire=20)
 async def fetch_current_weather(latitude: float = 40.7128, longitude: float = -74.0060):
@@ -100,9 +116,6 @@ async def fetch_current_weather(latitude: float = 40.7128, longitude: float = -7
     else:
         return JSONResponse(content={'detail': 'Failed to fetch weather'}, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-
-from core.email_util import send_email
 
 @app.get('/test-send-mail', status_code=status.HTTP_200_OK)
 async def test_send_mail():
