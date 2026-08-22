@@ -60,9 +60,9 @@ services:
       redis:
         condition: service_healthy
     environment:
-      SQLALCHEMY_DATABASE_URL: postgresql://postgres:postgres@db:5432/postgres
-      REDIS_URL: redis://redis:6379/0
-      JWT_SECRET_KEY: QWERTYUIOPASDFGHJKLZXCVBNM1234567890abcdefABCDEFGH
+      SQLALCHEMY_DATABASE_URL: ${SQLALCHEMY_DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
     ports:
       - "8000:8000"
     command: fastapi dev main.py --host 0.0.0.0 --port 8000
@@ -79,9 +79,9 @@ services:
       redis:
         condition: service_healthy
     environment:
-      SQLALCHEMY_DATABASE_URL: postgresql://postgres:postgres@db:5432/postgres
-      REDIS_URL: redis://redis:6379/0
-      JWT_SECRET_KEY: QWERTYUIOPASDFGHJKLZXCVBNM1234567890abcdefABCDEFGH
+      SQLALCHEMY_DATABASE_URL: ${SQLALCHEMY_DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
     command: bash -c 'celery -A core.celery_conf worker --loglevel=info'
     volumes:
       - ./app:/usr/src/app
