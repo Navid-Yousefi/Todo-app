@@ -180,5 +180,4 @@ cython_debug/
 .cursorindexingignore
 postgres/data
 redis/data
-docker-compose.yml
 dockerFile.dev
