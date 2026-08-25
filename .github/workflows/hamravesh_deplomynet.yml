@@ -29,5 +29,7 @@ jobs:
         pip install -r requirements.txt
     - name: Test with pytest
       working-directory: ./app
+      env:
+        SENTRY_DSN: &{{ secrets.SENTRY_DSN }}
       run: |
         pytest
