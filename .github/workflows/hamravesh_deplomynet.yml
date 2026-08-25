@@ -20,7 +20,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python 3.11
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v5  # برای بهبود عملکرد بهتر است به v5 ارتقا دهید
       with:
         python-version: "3.11"
     - name: Install dependencies
@@ -30,6 +30,6 @@ jobs:
     - name: Test with pytest
       working-directory: ./app
       env:
-        SENTRY_DSN: &{{ secrets.SENTRY_DSN }}
+        SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
       run: |
         pytest
