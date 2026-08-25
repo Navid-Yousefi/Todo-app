@@ -22,3 +22,4 @@ async def send_email(subject: str, recipients: list[str], body: str):
     )
     fm = FastMail(conf)
     await fm.send_message(message)
+
